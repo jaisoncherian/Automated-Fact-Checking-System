@@ -1046,12 +1046,13 @@ async function checkFact() {
 
   try {
     const response = await fetch(
-      `http://127.0.0.1:8000/check?text=${encodeURIComponent(text)}`,
+      `http://127.0.0.1:8000/check`,
       { 
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
-        }
+        },
+        body: JSON.stringify({ text: text })
       }
     );
 
@@ -1060,6 +1061,11 @@ async function checkFact() {
     }
 
     const data = await response.json();
+
+    // DEBUG - add these lines
+    console.log("RAW DATA:", data);
+    console.log("RESULT:", data.result);
+    console.log("VERDICT:", data.result.toLowerCase());
     
     // Update badge based on verdict
     const verdict = data.result.toLowerCase();

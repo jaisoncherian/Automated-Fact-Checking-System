@@ -17,10 +17,22 @@ export default function App() {
     setResult(null); // Clear previous result
 
     try {
-      const url = `http://127.0.0.1:8000/check?text=${encodeURIComponent(text)}`;
+      const url = `http://127.0.0.1:8000/check`;
       console.log("📡 Sending request to:", url);
       
-      const res = await fetch(url, { method: "POST" });
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: text })
+      });
+      
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        console.error("❌ API Error:", res.status, errorData);
+        setError(`API Error: ${res.status}`);
+        return;
+      }
+      
       const data = await res.json();
       
       console.log("✅ FULL RESPONSE RECEIVED:", data);
@@ -45,6 +57,7 @@ export default function App() {
   };
 
   const getVerdictInfo = () => {
+    console.log("RAW RESULT FROM BACKEND:", JSON.stringify(result)); // DIAGNOSTIC
     console.log("=== getVerdictInfo called ===");
     console.log("result:", result);
     console.log("result.result:", result?.result);
@@ -65,6 +78,17 @@ export default function App() {
     console.log("Raw verdict:", rawVerdict);
     console.log("Processed verdict:", verdict);
     console.log("Type:", typeof verdict);
+    console.log("Character codes:", [...verdict].map(c => c.charCodeAt(0)));
+    
+    // DEBUG: Show if there are hidden characters
+    if (verdict !== "true" && verdict !== "false" && verdict !== "suspicious" && verdict !== "unknown") {
+      console.warn("⚠️ VERDICT CONTAINS UNEXPECTED CHARACTERS!", {
+        raw: rawVerdict,
+        processed: verdict,
+        length: verdict.length,
+        chars: [...verdict].map((c, i) => `${i}:'${c}'(${c.charCodeAt(0)})`)
+      });
+    }
 
     if (verdict === "true") {
       console.log("MATCH: TRUE");
