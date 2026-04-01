@@ -70,6 +70,14 @@ MOCK_FACTS = [
     {"claim": "The moon is a planet", "label": "false"},
     {"claim": "Stars are holes in the sky", "label": "false"},
     {"claim": "The sun is cold", "label": "false"},
+    
+    # TRANSLATION FALLBACK / RECOVERY ENTRIES (for Malayalam and other non-English inputs)
+    # These help catch cases where translation returns transliteration or partial translation
+    {"claim": "the earth is round", "label": "true"},
+    {"claim": "earth is spherical", "label": "true"},
+    {"claim": "bhoomi is round", "label": "true"},        # Malayalam transliteration fallback
+    {"claim": "bhumi is round", "label": "true"},          # alternate transliteration spelling
+    {"claim": "the world is round", "label": "true"},
 ]
 
 def check_fact(user_input):
@@ -120,7 +128,7 @@ def check_fact(user_input):
     print(f"🏷️  DB label   : '{raw_label}' (cleaned)")
 
     # ── Threshold logic ──────────────────────────────────────
-    if max_score >= 0.40:          # lowered from 0.60
+    if max_score >= 0.35:          # lowered from 0.60 to 0.40, now 0.35 for short sentences
         # Good match — trust the label directly
         if raw_label == "true":
             result = "true"
@@ -143,6 +151,16 @@ def check_fact(user_input):
     print(f"📤 FINAL: {result} | score: {max_score:.4f}")
     print(f"{'='*60}\n")
 
-    return result, max_score
+    # Generate explanation based on verdict
+    if result == "true":
+        explanation = f"This claim matches a verified fact with {round(max_score*100, 1)}% confidence."
+    elif result == "fake":
+        explanation = f"This claim contradicts a verified fact with {round(max_score*100, 1)}% confidence."
+    elif result == "suspicious":
+        explanation = "This claim could not be confidently verified. Please check trusted sources."
+    else:  # unknown
+        explanation = "No matching fact found in the database for this claim."
+
+    return result, max_score, explanation
 
 

@@ -6,6 +6,10 @@ app = Flask(__name__,
     template_folder=os.path.join(os.path.dirname(__file__), '')
 )
 
+# Register factcheck blueprint
+from factcheck.routes import factcheck_bp
+app.register_blueprint(factcheck_bp)
+
 @app.after_request
 def add_no_cache_headers(response):
     response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'

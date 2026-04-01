@@ -59,7 +59,15 @@ data = [
     {"claim": "time travel to the past is proven possible", "label": "false"},
     {"claim": "atoms are the smallest unit of matter", "label": "true"},
     {"claim": "humans can live without sleep", "label": "false"},
-    {"claim": "the earth is the center of the universe", "label": "false"}
+    {"claim": "the earth is the center of the universe", "label": "false"},
+    
+    # TRANSLATION FALLBACK / RECOVERY ENTRIES (for Malayalam and other non-English inputs)
+    # These help catch cases where translation returns transliteration or partial translation
+    {"claim": "the earth is round", "label": "true"},
+    {"claim": "earth is spherical", "label": "true"},
+    {"claim": "bhoomi is round", "label": "true"},        # Malayalam transliteration fallback
+    {"claim": "bhumi is round", "label": "true"},          # alternate transliteration spelling
+    {"claim": "the world is round", "label": "true"},
 ]
 
 # Clear existing data
